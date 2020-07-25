@@ -1,3 +1,4 @@
+<!-- Bar code scanner html template-->
 <template>
    
     <div class="slds-grid slds-m-around--small slds-hide" >
@@ -18,3 +19,77 @@
     <iframe  src="/resource/barcodeScanner_old/quaggajs.html" style="width:100%;" id="_quaggaFrame" class="au slds-hide" ></iframe>
   
 </template>
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+// Bar code scanner javascript file
+import { LightningElement, track, wire } from 'lwc';
+
+export default class BarCodeScannerWarehouseLwc extends LightningElement  {
+   @track barcodeVal;
+  
+  //Initial load
+  connectedCallback(){
+      if (window.addEventListener) {
+        window.addEventListener("message", (result) =>{
+          var _result = JSON.parse(result.data);
+          var barCode = 'NULL';
+            try{
+				barCode = _result.codeResult.code;
+             }catch(e){
+                console.log('result is ', _result);
+             } 
+             this.barcodeVal = barCode;
+
+        }, false);
+    } else {
+        window.attachEvent("onmessage", (result) =>{
+        var _result = JSON.parse(result.data);
+        var barCode = 'NULL';
+          try{
+            barCode = _result.codeResult.code;
+          }catch(e){
+                console.log('result is ', _result);
+          }
+          this.barcodeVal = barCode;  
+        });
+    }
+  }
+    
+  refreshPage(){
+    window.location.reload();
+  }
+
+    scanBarCode(event){
+        this.template.querySelector('input').click();
+    }
+
+    uploadBarcode(event){
+       let quaggaFrame = this.template.querySelector('iframe');
+       let barCodeImage = this.template.querySelector('img');
+       let imgContainer = this.template.querySelector('.imgContainer');
+   
+
+        var file = event.target.files[0];
+        var reader = new FileReader();
+        var blob = file.slice(0, file.size);
+        reader.readAsBinaryString(blob);
+
+        reader.onloadend = function(e) {
+            if (e.target.readyState == FileReader.DONE) {
+                
+                var fileContent = 'data:' + file.type + ';base64,' + btoa(e.target.result);
+                barCodeImage.src = fileContent;
+                imgContainer.classList.remove('slds-hide');
+                var quaggaData = {};
+                quaggaData.imageWidth = 800;
+                
+                if(barCodeImage.naturalWidth>800){
+                  quaggaData.imageWidth = barCodeImage.naturalWidth;
+                }
+                
+                quaggaData.fileContent = fileContent;
+                quaggaFrame.contentWindow.postMessage(JSON.stringify(quaggaData), '*');
+              }
+        }
+    }
+}
