@@ -1,0 +1,20 @@
+<template>
+   
+    <div class="slds-grid slds-m-around--small slds-hide" >
+        <input id="uploadBarcode" type="file"  accept="image/*" onchange={uploadBarcode}/>
+    </div>
+    <div class="slds-grid slds-grid--pull-padded">
+        <div class="slds-col--bump-right">   
+		<lightning-button class="" variant="neutral" label="Scan Barcode" onclick={scanBarCode} ></lightning-button>
+		</div>
+        <div class="slds-col--padded">  <lightning-button class="" variant="neutral" label="Reset" onclick={refreshPage} ></lightning-button></div>
+    </div>
+    <div id="_barCodeImageContainer" data-id="imgContainer" class="imgContainer slds-grid slds-m-around--small slds-box slds-theme--default slds-hide" >
+        <img src="" class="barcodeContainer" id="barCodeImage"  />
+    </div><br/>
+
+    
+    <center>Output Scanned Data: {barcodeVal}</center><br/>
+    <iframe  src="/resource/barcodeScanner_old/quaggajs.html" style="width:100%;" id="_quaggaFrame" class="au slds-hide" ></iframe>
+  
+</template>
